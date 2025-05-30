@@ -7,7 +7,6 @@ import { Bot, MessageSquare, Plus, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useCreateUser, useUser } from "@/hooks/use-user";
 import { useDashboardStats, useRecentActivity } from "@/hooks/use-dashboard";
-import { getUser } from "@/lib/actions/user-actions";
 
 export default function Dashboard() {
   const { mutate, isPending: creatingUser, error } = useCreateUser();
@@ -15,11 +14,6 @@ export default function Dashboard() {
   const { data: stats, isLoading: statsLoading } = useDashboardStats();
   const { data: recentActivity, isLoading: activityLoading } =
     useRecentActivity();
-
-    // const hasUser = await getUser();    
-    // console.log("Has user:", hasUser);
-
-    console.log("User data:", user);
 
   useEffect(() => {
     if (!user && !userLoading) {
@@ -39,7 +33,7 @@ export default function Dashboard() {
     );
   }
   return (
-    <div className="container mx-auto px-3 py-4 sm:px-4 sm:py-6 space-y-4 sm:space-y-6">
+    <div className="container mx-auto px-1 py-2 sm:px-4 sm:py-6 space-y-4 sm:space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -60,7 +54,7 @@ export default function Dashboard() {
 
       {/* Stats - Original Style */}
       <div className="space-y-3">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-16">
           <div>
             <div className="text-3xl font-bold text-gray-900">
               {stats?.assistantCount || 0}

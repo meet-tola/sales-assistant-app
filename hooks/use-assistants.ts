@@ -1,98 +1,117 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import {
-  getAssistants,
-  createAssistant,
-  deleteAssistant,
-  duplicateAssistant,
-  updateAssistantStatus,
-} from "@/lib/actions/assistant-actions"
-import type { AssistantStatus } from "@prisma/client"
-import { toast } from "sonner"
+"use client"
 
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import type { AssistantStatus } from "@prisma/client"
+
+// Hook to get all assistants
 export function useAssistants() {
   return useQuery({
     queryKey: ["assistants"],
-    queryFn: getAssistants,
+    queryFn: async () => {
+      const response = await fetch("/api/assistants")
+      if (!response.ok) throw new Error("Failed to fetch assistants")
+      return response.json()
+    },
   })
 }
 
+// Hook to get specific assistant
+export function useAssistant(id: string) {
+  return useQuery({
+    queryKey: ["assistants", id],
+    queryFn: async () => {
+      const response = await fetch(`/api/assistants/${id}`)
+      if (!response.ok) throw new Error("Failed to fetch assistant")
+      return response.json()
+    },
+    enabled: !!id,
+  })
+}
+
+// Hook to create assistant
 export function useCreateAssistant() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: createAssistant,
-    onSuccess: (data) => {
-      if (data.success) {
-        queryClient.invalidateQueries({ queryKey: ["assistants"] })
-        queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] })
-        queryClient.invalidateQueries({ queryKey: ["user-tokens"] })
-        toast.success(`Assistant created successfully! Used ${data.tokensUsed} tokens.`)
-      } else {
-        toast.error(data.error || "Failed to create assistant")
-      }
+    mutationFn: async (formData: {
+      name: string
+      type: string
+      instructions: string
+      welcomeMessage: string
+      deliveryMethod: string
+      tone: string
+      responseLength: string
+    }) => {
+      const response = await fetch("/api/assistants", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
+      if (!response.ok) throw new Error("Failed to create assistant")
+      return response.json()
     },
-    onError: () => {
-      toast.error("Failed to create assistant")
-    },
-  })
-}
-
-export function useDeleteAssistant() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: deleteAssistant,
-    onSuccess: (data) => {
-      if (data.success) {
-        queryClient.invalidateQueries({ queryKey: ["assistants"] })
-        queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] })
-        toast.success("Assistant deleted successfully")
-      } else {
-        toast.error(data.error || "Failed to delete assistant")
-      }
-    },
-    onError: () => {
-      toast.error("Failed to delete assistant")
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["assistants"] })
+      queryClient.invalidateQueries({ queryKey: ["user", "tokens"] })
+      queryClient.invalidateQueries({ queryKey: ["dashboard", "stats"] })
     },
   })
 }
 
-export function useDuplicateAssistant() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: duplicateAssistant,
-    onSuccess: (data) => {
-      if (data.success) {
-        queryClient.invalidateQueries({ queryKey: ["assistants"] })
-        queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] })
-        queryClient.invalidateQueries({ queryKey: ["user-tokens"] })
-        toast.success("Assistant duplicated successfully")
-      } else {
-        toast.error(data.error || "Failed to duplicate assistant")
-      }
-    },
-    onError: () => {
-      toast.error("Failed to duplicate assistant")
-    },
-  })
-}
-
+// Hook to update assistant status
 export function useUpdateAssistantStatus() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, status }: { id: string; status: AssistantStatus }) => updateAssistantStatus(id, status),
-    onSuccess: (data) => {
-      if (data.success) {
-        queryClient.invalidateQueries({ queryKey: ["assistants"] })
-        toast.success("Assistant status updated")
-      } else {
-        toast.error(data.error || "Failed to update assistant status")
-      }
+    mutationFn: async ({ id, status }: { id: string; status: AssistantStatus }) => {
+      const response = await fetch(`/api/assistants/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      })
+      if (!response.ok) throw new Error("Failed to update assistant status")
+      return response.json()
     },
-    onError: () => {
-      toast.error("Failed to update assistant status")
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["assistants"] })
+    },
+  })
+}
+
+// Hook to delete assistant
+export function useDeleteAssistant() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch(`/api/assistants/${id}`, {
+        method: "DELETE",
+      })
+      if (!response.ok) throw new Error("Failed to delete assistant")
+      return response.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["assistants"] })
+      queryClient.invalidateQueries({ queryKey: ["dashboard", "stats"] })
+    },
+  })
+}
+
+// Hook to duplicate assistant
+export function useDuplicateAssistant() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch(`/api/assistants/${id}/duplicate`, {
+        method: "POST",
+      })
+      if (!response.ok) throw new Error("Failed to duplicate assistant")
+      return response.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["assistants"] })
+      queryClient.invalidateQueries({ queryKey: ["user", "tokens"] })
     },
   })
 }
