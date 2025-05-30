@@ -13,10 +13,12 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { SignedIn, SignedOut, SignUpButton } from "@clerk/nextjs";
+import Header from "@/components/header";
 
 export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen">
+      <Header />
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-white to-gray-50 py-20">
         <div className="container mx-auto px-4 sm:px-6">
