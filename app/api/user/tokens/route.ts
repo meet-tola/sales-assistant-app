@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/auth"
+import { deductTokens } from "@/lib/token"
 
 // GET /api/user/tokens - Get user tokens
 export async function GET() {
@@ -32,40 +33,17 @@ export async function POST(request: NextRequest) {
 
     const { tokens, operation, assistantId, description } = await request.json()
 
-    if (!tokens || !operation) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
-    }
-
-    // Check if user has enough tokens
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { tokens: true },
+    const result = await deductTokens({
+      userId,
+      tokens,
+      operation,
+      assistantId,
+      description,
     })
 
-    if (!user || user.tokens < tokens) {
-      return NextResponse.json({ error: "Insufficient tokens" }, { status: 400 })
+    if ("error" in result) {
+      return NextResponse.json({ error: result.error }, { status: 400 })
     }
-
-    // Deduct tokens and log usage
-    await prisma.$transaction([
-      prisma.user.update({
-        where: { id: userId },
-        data: {
-          tokens: {
-            decrement: tokens,
-          },
-        },
-      }),
-      prisma.tokenUsage.create({
-        data: {
-          userId,
-          assistantId,
-          operation,
-          tokens,
-          description,
-        },
-      }),
-    ])
 
     return NextResponse.json({ success: true })
   } catch (error) {

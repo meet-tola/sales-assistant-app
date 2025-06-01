@@ -33,7 +33,7 @@ export default function Dashboard() {
     );
   }
   return (
-    <div className="container mx-auto px-1 py-2 sm:px-4 sm:py-6 space-y-4 sm:space-y-6">
+    <div className="container mx-auto md:px-4 md:py-6 space-y-4 sm:space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -185,7 +185,7 @@ export default function Dashboard() {
                 </div>
               ) : recentActivity && recentActivity.length > 0 ? (
                 <div className="space-y-2 sm:space-y-3">
-                  {recentActivity.map((activity, index) => (
+                  {recentActivity.map((activity: any, index: number) => (
                     <div
                       key={activity.id}
                       className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-gray-50 rounded-lg"

@@ -23,7 +23,7 @@ import { usePathname } from "next/navigation"
 const items = [
   {
     title: "Dashboard",
-    url: "/",
+    url: "/dashboard",
     icon: Home,
   },
   {

@@ -27,7 +27,7 @@ export default function Navbar() {
         </div>
 
         {/* Logo */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 md:hidden">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Bot className="h-4 w-4" />
           </div>
@@ -37,7 +37,7 @@ export default function Navbar() {
           </div>
         </div>
 
-        <Separator orientation="vertical" className="hidden md:block h-4" />
+        {/* <Separator orientation="vertical" className="hidden md:block h-4" /> */}
 
         {/* Breadcrumb */}
         <Breadcrumb className="hidden md:block">

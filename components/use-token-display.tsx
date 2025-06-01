@@ -6,7 +6,6 @@ import { Coins, Loader2 } from "lucide-react";
 
 export function UserTokenDisplay() {
   const { data: userTokens, isLoading } = useUserTokens();
-  console.log("User tokens data:", userTokens);
 
   return (
     <div className="flex items-center gap-4">

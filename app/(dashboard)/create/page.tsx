@@ -107,7 +107,7 @@ export default function CreateAssistant() {
 
   return (
     <div className="min-h-screen">
-      <div className="mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <div>
         {/* Header */}
         <div className="mb-8">
           <Button variant="ghost" size="sm" className="mb-4 text-gray-600 hover:text-gray-900" asChild>
